@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VaultDL - 4K Video & Lossless Audio Downloader</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-container">
+                <div class="logo-decoration"></div>
+                <div class="logo">
+                    <span class="logo-text">VAULT</span><span class="logo-accent">DL</span>
+                </div>
+                <div class="logo-decoration"></div>
+            </div>
+            <p class="subtitle">4K video. Lossless audio. Zero noise.</p>
+            <p class="header-hint">✨ Supported: YouTube, Facebook, Shorts</p>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+        <!-- Idle State Card -->
+        <div id="idle-card" class="card">
+            <!-- URL Input with Helper -->
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <input 
+                        type="text" 
+                        id="url-input" 
+                        class="url-input" 
+                        placeholder="Paste YouTube or Facebook URL..."
+                        autocomplete="off"
+                    >
+                    <button id="paste-btn" class="paste-btn" title="Paste from clipboard" aria-label="Paste from clipboard">
+                        📋
+                    </button>
+                </div>
+                <div id="url-error" class="error-message"></div>
+            </div>
+
+            <!-- Type Toggle -->
+            <div class="toggle-group">
+                <button class="toggle-btn active" data-type="video">
+                    <span class="toggle-icon">🎬</span> VIDEO
+                </button>
+                <button class="toggle-btn" data-type="audio">
+                    <span class="toggle-icon">🎵</span> AUDIO
+                </button>
+            </div>
+
+            <!-- Quality/Format Selection -->
+            <div id="quality-section" class="quality-section active">
+                <div class="quality-label">VIDEO QUALITY</div>
+                <div class="quality-grid">
+                    <button class="quality-btn active" data-quality="best" title="Best available resolution">BEST</button>
+                    <button class="quality-btn" data-quality="2160" title="4K Ultra HD - 2160p">4K</button>
+                    <button class="quality-btn" data-quality="1440" title="2K Quad HD - 1440p">2K</button>
+                    <button class="quality-btn" data-quality="1080" title="Full HD - 1080p">1080p</button>
+                    <button class="quality-btn" data-quality="720" title="HD - 720p">720p</button>
+                    <button class="quality-btn" data-quality="480" title="SD - 480p">480p</button>
+                </div>
+                <p class="quality-note">⚡ 4K/2K downloads may take several minutes and use HDR-capable MKV format</p>
+            </div>
+
+            <div id="format-section" class="quality-section">
+                <div class="quality-label">AUDIO FORMAT</div>
+                <div class="quality-grid">
+                    <button class="quality-btn active" data-format="mp3_320" title="MP3 at 320 kbps - High quality">MP3 320k</button>
+                    <button class="quality-btn" data-format="mp3_256" title="MP3 at 256 kbps - Good quality">MP3 256k</button>
+                    <button class="quality-btn" data-format="aac_256" title="AAC at 256 kbps - Modern codec">AAC 256k</button>
+                    <button class="quality-btn" data-format="flac" title="FLAC - Lossless, full quality">
+                        FLAC <span class="badge">LOSSLESS</span>
+                    </button>
+                    <button class="quality-btn" data-format="wav" title="WAV - Uncompressed PCM audio">
+                        WAV <span class="badge">LOSSLESS</span>
+                    </button>
+                    <button class="quality-btn" data-format="opus" title="Opus - Modern, efficient codec">OPUS</button>
+                </div>
+            </div>
+
+            <!-- Download Button -->
+            <button id="download-btn" class="download-btn">DOWNLOAD</button>
+        </div>
+
+        <!-- Progress State Card -->
+        <div id="progress-card" class="card progress-card hidden">
+            <div class="progress-header">
+                <div class="phase-label" id="phase-label">STARTING</div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Merge Spinner (hidden by default) -->
+            <div id="merge-spinner" class="merge-spinner hidden">
+                <div class="spinner"></div>
+                <p>FFmpeg is merging streams...</p>
+            </div>
+
+            <!-- Progress Stats -->
+            <div class="stats-row">
+                <div class="stat-pill">
+                    <span id="stat-percent">0%</span>
+                </div>
+                <div class="stat-pill">
+                    <span id="stat-speed">0 B/s</span>
+                </div>
+                <div class="stat-pill">
+                    <span id="stat-eta">calculating...</span>
+                </div>
+            </div>
+
+            <!-- File Size -->
+            <div class="filesize-line" id="filesize-line"></div>
+        </div>
+
+        <!-- Done State Card -->
+        <div id="done-card" class="card done-card hidden">
+            <div class="done-header">
+                <svg class="checkmark" viewBox="0 0 52 52">
+                    <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none" stroke-width="2"/>
+                    <path class="checkmark-path" fill="none" stroke-width="3" d="M 14.1 27.2l 7.1 7.2 16.7 -16.6"/>
+                </svg>
+                <h2>Your file is ready</h2>
+            </div>
+
+            <div class="done-details">
+                <div class="filename-badge">
+                    <span id="done-filename"></span>
+                </div>
+                <div class="filesize-text" id="done-filesize"></div>
+            </div>
+
+            <div class="done-actions">
+                <button id="download-file-btn" class="download-btn">DOWNLOAD FILE</button>
+                <button id="start-over-btn" class="start-over-btn">START OVER</button>
+            </div>
+        </div>
+
+        <!-- Error State Card -->
+        <div id="error-card" class="card error-card hidden">
+            <div class="error-header">
+                <span class="error-icon">⚠️</span>
+                <h2>Download Failed</h2>
+            </div>
+            <p id="error-message" class="error-detail"></p>
+            <button id="error-retry-btn" class="download-btn">TRY AGAIN</button>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+  window.VAULTDL_BACKEND = 'https://your-railway-url.com';
+</script>
+</body>
+</html>
